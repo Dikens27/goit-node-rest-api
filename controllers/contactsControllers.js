@@ -89,6 +89,12 @@ export async function updateContact(req, res, next) {
 
 export async function updateStatusContact(req, res, next) {
   const { id } = req.params;
+  const { favorite } = req.body;
+  const { error } = updateContactSchema.validate({ favorite });
+
+  if (error) {
+    return res.status(400).send(error.message);
+  }
 
   try {
     const result = await Contact.findByIdAndUpdate(id, req.body, { new: true });
