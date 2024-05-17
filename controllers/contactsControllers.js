@@ -1,8 +1,5 @@
-import {
-  createContactSchema,
-  updateContactSchema,
-} from "../schemas/contactsSchemas.js";
 import Contact from "../models/contact.js";
+import HttpError from "../helpers/HttpError.js";
 
 export async function getAllContacts(req, res, next) {
   try {
@@ -20,7 +17,7 @@ export async function getOneContact(req, res, next) {
     const oneContact = await Contact.findById(id);
 
     if (oneContact === null) {
-      res.status(404).send("Contact not found");
+      throw HttpError(404);
     }
 
     res.status(200).send(oneContact);
@@ -36,7 +33,7 @@ export async function deleteContact(req, res, next) {
     const deletedContact = await Contact.findByIdAndDelete(id);
 
     if (deletedContact === null) {
-      res.status(404).send("Contact not found");
+      throw HttpError(404);
     }
 
     res.status(200).send({ id });
@@ -48,11 +45,6 @@ export async function deleteContact(req, res, next) {
 export async function createContact(req, res, next) {
   const { name, email, phone } = req.body;
 
-  const { error } = createContactSchema.validate({ name, email, phone });
-  if (error) {
-    return res.status(400).send("Fields must be filled");
-  }
-
   try {
     const newContact = await Contact.create({ name, email, phone });
     res.status(201).send(newContact);
@@ -63,22 +55,16 @@ export async function createContact(req, res, next) {
 
 export async function updateContact(req, res, next) {
   const { id } = req.params;
-  const { name, email, phone } = req.body;
-  const { error } = updateContactSchema.validate({ name, email, phone });
 
   if (Object.keys(req.body).length === 0) {
     return res.status(400).send("Body must have at least one field");
-  }
-
-  if (error) {
-    return res.status(400).send(error.message);
   }
 
   try {
     const result = await Contact.findByIdAndUpdate(id, req.body, { new: true });
 
     if (result === null) {
-      res.status(404).send("Not found");
+      throw HttpError(404);
     }
 
     res.status(200).send(result);
@@ -89,18 +75,12 @@ export async function updateContact(req, res, next) {
 
 export async function updateStatusContact(req, res, next) {
   const { id } = req.params;
-  const { favorite } = req.body;
-  const { error } = updateContactSchema.validate({ favorite });
-
-  if (error) {
-    return res.status(400).send(error.message);
-  }
 
   try {
     const result = await Contact.findByIdAndUpdate(id, req.body, { new: true });
 
     if (result === null) {
-      res.status(404).send("Not found");
+      throw HttpError(404);
     }
 
     res.status(200).send(result);
