@@ -10,9 +10,9 @@ import {
 import {
   createContactSchema,
   updateContactSchema,
+  updateStatusContactSchema,
 } from "../schemas/contactsSchemas.js";
-import validateBody from "../helpers/validateBody.js";
-
+import { validateBody, validateObjectId } from "../helpers/validateBody.js";
 const contactsRouter = express.Router();
 const jsonParser = express.json();
 
@@ -32,14 +32,14 @@ contactsRouter.post(
 contactsRouter.put(
   "/:id",
   jsonParser,
-  validateBody(createContactSchema),
+  validateBody(updateContactSchema),
   updateContact
 );
 
 contactsRouter.patch(
   "/:id/favorite",
   jsonParser,
-  validateBody(updateContactSchema),
+  validateObjectId,
   updateStatusContact
 );
 
