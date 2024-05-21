@@ -1,6 +1,7 @@
 import HttpError from "../helpers/HttpError.js";
 import User from "../models/user.js";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 
 export async function register(req, res, next) {
   const { email, password } = req.body;
@@ -13,10 +14,11 @@ export async function register(req, res, next) {
     }
 
     const passwordHash = await bcrypt.hash(password, 10);
+    const newUser = await User.create({ email, password: passwordHash });
 
-    await User.create({ email, password: passwordHash });
+    const { subscription } = newUser;
 
-    res.status(201).send({ message: "Registration successfully" });
+    res.status(201).send({ user: { email, subscription } });
   } catch (error) {
     next(error);
   }
@@ -37,9 +39,48 @@ export async function login(req, res, next) {
     if (isMatch === false) {
       throw HttpError(401, "Email or password is wrong");
     }
+
+    const userInfo = {
+      id: user._id,
+      email: user.email,
+    };
+
+    const token = jwt.sign(userInfo, process.env.JWT_SECRET, {
+      expiresIn: "1h",
+    });
+
+    await User.findByIdAndUpdate(user._id, { token });
+
+    res
+      .status(200)
+      .send({ token, user: { email, subscription: user.subscription } });
   } catch (error) {
     next(error);
   }
+}
 
-  res.send("Login");
+export async function logout(req, res, next) {
+  try {
+    await User.findByIdAndUpdate(req.user.id, { token: null });
+
+    res.status(204).end();
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function current(req, res, next) {
+  const { id } = req.user;
+
+  try {
+    const currentUser = await User.findById(id);
+
+    if (currentUser === null) {
+      throw HttpError(401);
+    }
+
+    res.status(200).send(currentUser);
+  } catch (error) {
+    next(error);
+  }
 }
