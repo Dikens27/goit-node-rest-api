@@ -10,7 +10,6 @@ import {
 import {
   createContactSchema,
   updateContactSchema,
-  updateStatusContactSchema,
 } from "../schemas/contactsSchemas.js";
 import { validateBody, validateObjectId } from "../helpers/validateBody.js";
 const contactsRouter = express.Router();
