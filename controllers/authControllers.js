@@ -79,7 +79,7 @@ export async function current(req, res, next) {
       throw HttpError(401);
     }
 
-    res.status(200).send(currentUser);
+    res.status(200).send({ currentUser: { email, subscription } });
   } catch (error) {
     next(error);
   }

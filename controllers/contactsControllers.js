@@ -44,7 +44,7 @@ export async function deleteContact(req, res, next) {
   const { id } = req.params;
 
   try {
-    const deletedContact = await Contact.findByIdAndDelete({
+    const deletedContact = await Contact.findOneAndDelete({
       _id: id,
       owner: req.user.id,
     });
@@ -83,7 +83,7 @@ export async function updateContact(req, res, next) {
   }
 
   try {
-    const result = await Contact.findByIdAndUpdate(
+    const result = await Contact.findOneAndUpdate(
       { _id: id, owner: req.user.id },
       req.body,
       { new: true }
@@ -103,7 +103,7 @@ export async function updateStatusContact(req, res, next) {
   const { id } = req.params;
 
   try {
-    const result = await Contact.findByIdAndUpdate(
+    const result = await Contact.findOneAndUpdate(
       { _id: id, owner: req.user.id },
       req.body,
       { new: true }
