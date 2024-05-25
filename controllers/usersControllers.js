@@ -1,5 +1,6 @@
 import * as fs from "node:fs/promises";
 import path from "node:path";
+import Jimp from "jimp";
 
 import User from "../models/user.js";
 
@@ -8,6 +9,9 @@ export async function uploadAvatar(req, res, next) {
     if (!req.file) {
       return res.status(400).send("Please select the avatar file");
     }
+
+    const userAvatar = await Jimp.read(req.file.path);
+    await userAvatar.cover(250, 250).writeAsync(req.file.path);
 
     const newPath = path.resolve("public/avatars", req.file.filename);
 

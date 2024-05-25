@@ -4,6 +4,7 @@ import morgan from "morgan";
 import cors from "cors";
 import "./db.js";
 import { authMiddleware } from "./helpers/authMiddleware.js";
+import path from "node:path";
 
 import contactsRouter from "./routes/contactsRouter.js";
 import authRouter from "./routes/authRouter.js";
@@ -14,6 +15,8 @@ const app = express();
 app.use(morgan("tiny"));
 app.use(cors());
 app.use(express.json());
+
+app.use("/api/avatars", express.static(path.resolve("public/avatars")));
 
 app.use("/api/auth", authRouter);
 app.use("/api/contacts", authMiddleware, contactsRouter);
