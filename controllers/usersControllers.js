@@ -13,13 +13,13 @@ export async function uploadAvatar(req, res, next) {
     const userAvatar = await Jimp.read(req.file.path);
     await userAvatar.cover(250, 250).writeAsync(req.file.path);
 
-    const newPath = path.resolve("public/avatars", req.file.filename);
+    const newPath = path.join("public/avatars", req.file.filename);
 
     await fs.rename(req.file.path, newPath);
 
     const user = await User.findByIdAndUpdate(
       { _id: req.user.id },
-      { avatarURl: req.file.filename },
+      { avatarURl: `/avatars/${req.file.filename}` },
       { new: true }
     );
 
