@@ -59,6 +59,10 @@ export async function login(req, res, next) {
       throw HttpError(401, "Email or password is wrong");
     }
 
+    if (user.verify === false) {
+      throw HttpError(401, "Please verify your email");
+    }
+
     const userInfo = {
       id: user._id,
       email: user.email,
