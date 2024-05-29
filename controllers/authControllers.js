@@ -1,8 +1,10 @@
 import HttpError from "../helpers/HttpError.js";
 import User from "../models/user.js";
 import bcrypt from "bcrypt";
+import crypto from "node:crypto";
 import jwt from "jsonwebtoken";
 import gravatar from "gravatar";
+import mail from "../mail/mail.js";
 
 export async function register(req, res, next) {
   const { email, password } = req.body;
@@ -16,14 +18,18 @@ export async function register(req, res, next) {
 
     const passwordHash = await bcrypt.hash(password, 10);
     const generatedAvatar = gravatar.url(email);
+    const verifyToken = crypto.randomUUID();
 
     const newUser = await User.create({
       email,
       password: passwordHash,
-      avatarURl: generatedAvatar,
+      avatarURl: `http:${generatedAvatar}`,
+      verifyToken,
     });
 
     const { subscription } = newUser;
+
+    await mail.sendMail(email);
 
     res.status(201).send({ user: { email, subscription } });
   } catch (error) {
@@ -45,6 +51,10 @@ export async function login(req, res, next) {
 
     if (isMatch === false) {
       throw HttpError(401, "Email or password is wrong");
+    }
+
+    if (user.verify === false) {
+      throw HttpError(401, "Please verify your email");
     }
 
     const userInfo = {
