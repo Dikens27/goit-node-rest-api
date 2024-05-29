@@ -23,19 +23,13 @@ export async function register(req, res, next) {
     const newUser = await User.create({
       email,
       password: passwordHash,
-      avatarURl: generatedAvatar,
+      avatarURl: `http:${generatedAvatar}`,
       verifyToken,
     });
 
     const { subscription } = newUser;
 
-    await mail.sendMail({
-      to: email,
-      from: "kar.karovich321@gmail.com",
-      subject: "Welcome to Phone book",
-      html: `To confirm your email please click on the <a href="http://localhost:3000/api/users/verify/${verifyToken}">link</a>`,
-      text: `To confirm your email please open the link http://localhost:3000/api/users/verify/${verifyToken}`,
-    });
+    await mail.sendMail(email);
 
     res.status(201).send({ user: { email, subscription } });
   } catch (error) {

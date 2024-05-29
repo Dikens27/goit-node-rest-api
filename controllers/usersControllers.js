@@ -70,13 +70,7 @@ export async function repeatVerify(req, res, next) {
       throw HttpError(400, "Verification has already been passed");
     }
 
-    await mail.sendMail({
-      to: email,
-      from: "kar.karovich321@gmail.com",
-      subject: "Welcome to Phone book",
-      html: `To confirm your email please click on the <a href="http://localhost:3000/api/users/verify/${verifyToken}">link</a>`,
-      text: `To confirm your email please open the link http://localhost:3000/api/users/verify/${verifyToken}`,
-    });
+    await mail.sendMail(email);
 
     res.status(200).send({ message: "Verification email sent" });
   } catch (error) {
