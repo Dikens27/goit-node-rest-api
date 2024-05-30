@@ -13,7 +13,7 @@ const transport = nodemailer.createTransport({
   },
 });
 
-function sendMail(email) {
+function sendMail(email, verifyToken) {
   const message = {
     to: email,
     from: MAILTRAP_SENDER,

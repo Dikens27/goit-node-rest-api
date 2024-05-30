@@ -62,7 +62,7 @@ export async function repeatVerify(req, res, next) {
     }
 
     const user = await User.findOne({ email });
-    const token = user.verificationToken;
+    const verifyToken = user.verificationToken;
 
     if (user === null) {
       throw HttpError(404, "User not found");
@@ -72,7 +72,7 @@ export async function repeatVerify(req, res, next) {
       throw HttpError(400, "Verification has already been passed");
     }
 
-    await mail.sendMail(email);
+    await mail.sendMail(email, verifyToken);
 
     res.status(200).send({ message: "Verification email sent" });
   } catch (error) {
