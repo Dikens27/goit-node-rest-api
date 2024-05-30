@@ -29,7 +29,7 @@ export async function register(req, res, next) {
 
     const { subscription } = newUser;
 
-    await mail.sendMail(email);
+    await mail.sendMail(email, verifyToken);
 
     res.status(201).send({ user: { email, subscription } });
   } catch (error) {
